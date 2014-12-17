@@ -1,6 +1,14 @@
 <?php
 
-trait AdcWpdbHooker {
+class AdcWpdb extends wpdb {
+
+    protected $adc_ttl = 0;
+    protected $ignore = null;
+
+    public function __construct () {
+        $this->adc_ttl = defined('ADC_TTL') ? ADC_TTL : 60;
+        parent::__construct(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+    }
 
     /**
      * @param string $query
@@ -9,7 +17,7 @@ trait AdcWpdbHooker {
     public function query($query) {
         $ret = null;
         // SELECT
-        if (preg_match('/^SELECT.*/is', trim($query))) {
+        if (!$this->isIgnore() && preg_match('/^SELECT.*/is', trim($query))) {
 
             $qhash = hash('crc32b', $query);
             if (apc_exists($qhash)) {
@@ -23,6 +31,21 @@ trait AdcWpdbHooker {
             $ret = parent::query($query);
         }
         return $ret;
+    }
+
+    /**
+     * @return bool|null
+     */
+    protected function isIgnore () {
+        if ($this->ignore === null) {
+            global $pagenow;
+            if ($pagenow === null) {
+                return is_admin();
+            } else {
+                $this->ignore = ($pagenow === 'wp-login.php' || is_admin());
+            }
+        }
+        return $this->ignore;
     }
 
     /**
@@ -57,20 +80,6 @@ trait AdcWpdbHooker {
         $this->last_error    = $data['last_error'];
 
         return $data['num_rows'];
-    }
-}
-
-class AdcWpdb extends wpdb {
-
-    use AdcWpdbHooker;
-
-    protected $adc_ttl = 0;
-
-    public function __construct () {
-
-        $this->adc_ttl = defined('ADC_TTL') ? ADC_TTL : 60;
-
-        parent::__construct(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
     }
 
 }
