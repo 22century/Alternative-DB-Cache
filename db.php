@@ -53,7 +53,7 @@ class AdcWpdb extends wpdb {
      * @param string $query
      */
     protected function saveCache ($key, $query) {
-        apc_add($key, [
+        apc_add($key, array(
             'last_result'   => $this->last_result,
             'result'        => $this->result,
             'col_info'      => null,
@@ -61,7 +61,7 @@ class AdcWpdb extends wpdb {
             'rows_affected' => $this->num_rows,
             'num_rows'      => $this->num_rows,
             'last_error'    => 0,
-        ], $this->adc_ttl);
+        ), $this->adc_ttl);
     }
 
     /**
