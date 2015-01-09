@@ -3,7 +3,7 @@
  * Plugin Name: Alternative DB Cache
  * Plugin URI: https://github.com/22century/Alternative-DB-Cache
  * Description: APCによるクエリキャッシュ
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: 22century
  * Author URI: https://github.com/22century
  * License: GPL2
